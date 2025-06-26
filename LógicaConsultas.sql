@@ -116,7 +116,6 @@ order by CUSTOMER_ID DESC
 LIMIT 10;
 
 --P.17-Encuentra el nombre y apellido de los actores que aparecen en la película con título ‘Egg Igby’.
---1º
 select F.TITLE ,
 	CONCAT(A.FIRST_NAME,' ',A.LAST_NAME) as actor_name
 FROM ACTOR AS A 
@@ -125,5 +124,37 @@ JOIN FILM AS F on FA.FILM_ID = F.FILM_ID
 WHERE F.TITLE = 'EGG IGBY';
 
 --P.18-Selecciona todos los nombres de las películas únicos.
+SELECT DISTINCT (TITLE)
+FROM FILM AS F ;
+--Al no haber ningún titulo con valor NULL, el número de películas es igual a pedir todos los titulos de películas sin el DISTINCT.
+
+--P.19-Encuentra el título de las películas que son comedias y tienen una duración mayor a 180 minutos en la tabla “film”
+SELECT 	F.TITLE,
+		F.LENGTH,
+		C.NAME
+FROM FILM AS F
+JOIN FILM_CATEGORY AS FC on F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C on FC.CATEGORY_ID = C.CATEGORY_ID
+WHERE C.NAME = 'Comedy' and F.LENGTH > 180;
+
+/*20. Encuentra las categorías de películas que tienen un promedio de
+duración superior a 110 minutos y muestra el nombre de la categoría
+junto con el promedio de duración.*/
+SELECT 	C.NAME as category,
+		ROUND(AVG(F.LENGTH), 2) as length_average
+FROM FILM AS F
+JOIN FILM_CATEGORY AS FC on F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C on FC.CATEGORY_ID = C.CATEGORY_ID
+GROUP BY C.NAME
+HAVING AVG(F.LENGTH) > 110;
+
+--21. ¿Cuál es la media de duración del alquiler de las películas?
+
+SELECT AVG(R.RETURN_DATE  - R.RENTAL_DATE)
+FROM RENTAL as R;
+
+--22. Crea una columna con el nombre y apellidos de todos los actores y actrices.
+SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME )
+FROM ACTOR AS A;
 
 
