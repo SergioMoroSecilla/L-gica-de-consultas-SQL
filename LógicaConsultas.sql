@@ -1,4 +1,4 @@
---P.1-Esquema de la BBDD creado
+--P.1-Esquema de la BBDD creado en archivo adjunto Esquema.png
 
 --P.2-Nombres de todas las películas con una clasificación por edades de 'R'
 SELECT FILM_ID, 
@@ -9,7 +9,7 @@ WHERE RATING = 'R';
 
 --P.3-Nombre de los actores que tengan un "actor_id" entre 30 y 40
 SELECT ACTOR_ID,
-		CONCAT(FIRST_NAME,' ',LAST_NAME) 
+		CONCAT(FIRST_NAME,' ',LAST_NAME) as "Actor name"
 FROM ACTOR AS A
 WHERE ACTOR_ID >=30 AND ACTOR_ID <=40;
 
@@ -47,15 +47,14 @@ WHERE LAST_NAME = 'ALLEN';
 /*--P.7-Encuentra la cantidad total de películas en cada clasificación de la tabla 
 “filmˮ y muestra la clasificación junto con el recuento.*/
 SELECT RATING, 
-		count(RATING) as numero_peliculas_por_rating
+		count(RATING) as numero_peliculas
 FROM FILM AS F
 group by RATING 
-order by numero_peliculas_por_rating ASC ;
+order by numero_peliculas ;
 
 /*--P.8-Encuentra el título de todas las películas que son ‘PG-13ʼ o tienen una 
 duración mayor a 3 horas en la tabla film.*/
-SELECT FILM_ID ,
-		TITLE ,
+SELECT 	TITLE ,
 		RATING ,
 		LENGTH 
 FROM FILM AS F 
@@ -74,8 +73,7 @@ FROM FILM AS F;
 
 
 --P.11-Encuentra lo que costó el antepenúltimo alquiler ordenado por día.
-SELECT CUSTOMER_ID, 
-		RENTAL_ID ,
+SELECT 	RENTAL_ID ,
 		RENTAL_DATE 
 FROM RENTAL AS R
 order by RENTAL_DATE desc
@@ -119,29 +117,13 @@ LIMIT 10;
 
 --P.17-Encuentra el nombre y apellido de los actores que aparecen en la película con título ‘Egg Igby’.
 --1º
-/*SELECT 
-	CONCAT(FIRST_NAME,' ',LAST_NAME) as nombre_actor
+select F.TITLE ,
+	CONCAT(A.FIRST_NAME,' ',A.LAST_NAME) as actor_name
 FROM ACTOR AS A 
-WHERE film.id;
---2º
-SELECT FILM_ID,
-		TITLE	
-FROM FILM_ACTOR AS FA 
-WHERE TITLE = 'Egg Igby';*/
-
-
-
+JOIN FILM_ACTOR AS FA on A.ACTOR_ID = FA.ACTOR_ID
+JOIN FILM AS F on FA.FILM_ID = F.FILM_ID 
+WHERE F.TITLE = 'EGG IGBY';
 
 --P.18-Selecciona todos los nombres de las películas únicos.
-select TITLE 
-FROM FILM AS F ;
-
-/*--P.19-Encuentra el título de las películas que son comedias y tienen una
-duración mayor a 180 minutos en la tabla “film”.*/
-SELECT FILM_ID,
-		TITLE,
-		LENGTH
-FROM FILM AS F 
-WHERE LENGTH > 180;
 
 
