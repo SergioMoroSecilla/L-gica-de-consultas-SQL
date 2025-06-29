@@ -157,4 +157,32 @@ FROM RENTAL as R;
 SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME )
 FROM ACTOR AS A;
 
+--23. Números de alquiler por día, ordenados por cantidad de alquiler de forma descendente.
+SELECT
+  DATE_TRUNC('day', R.RENTAL_DATE) AS dia_alquile,
+  COUNT(*)                         AS num_alquileres
+FROM RENTAL AS R
+GROUP BY DATE_TRUNC('day', R.RENTAL_DATE)
+ORDER BY num_alquileres DESC;
+
+--24. Encuentra las películas con una duración superior al promedio.
+--CALCULO DE LA MEDIA DE DURACIÓN DE LAS PELICULAS DE LA BBDD
+SELECT AVG(F.LENGTH)
+FROM FILM AS F;
+--CONSULTA
+SELECT F.LENGTH,
+		F.TITLE
+FROM FILM AS F 
+WHERE F.LENGTH > (SELECT AVG(LENGTH)
+		FROM FILM)
+ORDER BY F.LENGTH DESC;
+
+--25. Averigua el número de alquileres registrados por mes.
+--formula igual a las pregunta 23, modificando day por month
+SELECT  DATE_TRUNC('MONTH', R.RENTAL_DATE) AS mes_alquiler,
+  		COUNT(*) AS num_alquileres
+FROM RENTAL AS R
+GROUP BY DATE_TRUNC('MONTH', R.RENTAL_DATE)
+ORDER BY num_alquileres;
+
 
