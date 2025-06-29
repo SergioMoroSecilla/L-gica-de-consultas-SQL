@@ -150,8 +150,11 @@ HAVING AVG(F.LENGTH) > 110;
 
 --21. ¿Cuál es la media de duración del alquiler de las películas?
 
-SELECT AVG(R.RETURN_DATE  - R.RENTAL_DATE)
+SELECT AVG(R.RETURN_DATE  - R.RENTAL_DATE) as rental_duration
 FROM RENTAL as R;
+--A posteriori he visto que en tabla 'FILM' tenemos 'RENTAL_DURATION', por tanto la consulta sería...
+SELECT AVG(F.RENTAL_DURATION) AS rental_duration
+FROM FILM AS F 
 
 --22. Crea una columna con el nombre y apellidos de todos los actores y actrices.
 SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME )
@@ -173,8 +176,7 @@ FROM FILM AS F;
 SELECT F.LENGTH,
 		F.TITLE
 FROM FILM AS F 
-WHERE F.LENGTH > (SELECT AVG(LENGTH)
-		FROM FILM)
+WHERE F.LENGTH > (SELECT AVG(LENGTH) FROM FILM)
 ORDER BY F.LENGTH DESC;
 
 --25. Averigua el número de alquileres registrados por mes.
@@ -185,4 +187,28 @@ FROM RENTAL AS R
 GROUP BY DATE_TRUNC('MONTH', R.RENTAL_DATE)
 ORDER BY num_alquileres;
 
+--26. Encuentra el promedio, la desviación estándar y varianza del total pagado.
+SELECT ROUND(AVG(AMOUNT), 2) as payment_average, 
+		ROUND(STDDEV(AMOUNT), 2) as payment_standard_desviation, 
+		ROUND(VARIANCE(AMOUNT), 2) as variance
+FROM PAYMENT AS P;
+
+--27. ¿Qué películas se alquilan por encima del precio medio?
+SELECT F.TITLE,
+		P.AMOUNT
+FROM FILM F
+JOIN INVENTORY I ON F.FILM_ID = I.FILM_ID
+JOIN RENTAL R ON I.INVENTORY_ID = R.INVENTORY_ID
+JOIN PAYMENT P ON R.RENTAL_ID = P.RENTAL_ID 
+WHERE P.AMOUNT > (SELECT AVG(AMOUNT) FROM PAYMENT)
+ORDER BY P.AMOUNT DESC;
+
+--28. Muestra el id de los actores que hayan participado en más de 40 películas.
+SELECT A.ACTOR_ID,
+		COUNT(FA.FILM_ID) as total_peliculas
+FROM ACTOR AS A
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+GROUP BY A.ACTOR_ID 
+HAVING COUNT(FA.FILM_ID) > 40
+ORDER BY total_peliculas desc;
 
