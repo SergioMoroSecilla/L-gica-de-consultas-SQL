@@ -322,3 +322,18 @@ ORDER BY apellido desc;
 SELECT F.TITLE
 FROM FILM AS F 
 LIMIT 5;
+
+/*41. Agrupa los actores por su nombre y cuenta cuántos actores tienen el
+mismo nombre. ¿Cuál es el nombre más repetido?*/
+SELECT A.FIRST_NAME AS nombre,
+		COUNT(A.FIRST_NAME) AS number_actors
+FROM ACTOR AS A 
+GROUP BY A.FIRST_NAME
+ORDER BY number_actors DESC; 
+--Existen 3 nombres que son los que mas se repiten: Kenneth, Penelope y Julia
+
+--42. Encuentra todos los alquileres y los nombres de los clientes que los realizaron.
+SELECT R.RENTAL_ID,
+		CONCAT(C.FIRST_NAME, ' ', C.LAST_NAME) 
+FROM RENTAL AS R
+JOIN CUSTOMER AS C ON R.CUSTOMER_ID  = C.CUSTOMER_ID;
