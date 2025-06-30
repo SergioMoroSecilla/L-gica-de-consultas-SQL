@@ -279,3 +279,46 @@ LEFT JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
 GROUP BY F.TITLE
 ORDER BY rental_register;
 --volvemos a left join para no perder las películas que nunca se han alquilado.
+
+--34. Encuentra los 5 clientes que más dinero se hayan gastado con nosotros.
+SELECT C.CUSTOMER_ID,
+		CONCAT(C.FIRST_NAME, ' ', C.LAST_NAME) AS customer_nanme,
+		SUM(P.AMOUNT) AS customer_expenditure
+FROM CUSTOMER AS C 
+JOIN PAYMENT AS P ON C.CUSTOMER_ID  = P.CUSTOMER_ID 
+GROUP BY C.CUSTOMER_ID
+ORDER by customer_expenditure DESC
+limit 5;
+
+--35. Selecciona todos los actores cuyo primer nombre es 'Johnny'.
+SELECT A.FIRST_NAME,
+	A.LAST_NAME
+FROM ACTOR AS A
+WHERE A.FIRST_NAME = 'JOHNNY';
+--hay que tener cuidado porque el motor de consulta discrimina entre minuscula y mayuscula y por tanto ponemos 'JOHNNY'
+
+--36. Renombra la columna “first_name” como Nombre y “last_name” como Apellido.
+SELECT A.FIRST_NAME AS nombre,
+	A.LAST_NAME AS apellido
+FROM ACTOR AS A
+WHERE A.FIRST_NAME = 'JOHNNY';
+
+--37. Encuentra el ID del actor más bajo y más alto en la tabla actor.
+SELECT MIN(A.ACTOR_ID),
+	MAX(A.ACTOR_ID)
+FROM ACTOR AS A;
+
+--38. Cuenta cuántos actores hay en la tabla “actor”.
+SELECT COUNT(A.ACTOR_ID)
+FROM ACTOR AS A ;
+
+--39. Selecciona todos los actores y ordénalos por apellido en orden ascendente.
+SELECT A.FIRST_NAME AS nombre,
+	A.LAST_NAME AS apellido
+FROM ACTOR AS A
+ORDER BY apellido desc;
+
+--40. Selecciona las primeras 5 películas de la tabla “film”.
+SELECT F.TITLE
+FROM FILM AS F 
+LIMIT 5;
