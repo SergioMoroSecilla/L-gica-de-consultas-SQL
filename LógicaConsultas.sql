@@ -337,3 +337,21 @@ SELECT R.RENTAL_ID,
 		CONCAT(C.FIRST_NAME, ' ', C.LAST_NAME) 
 FROM RENTAL AS R
 JOIN CUSTOMER AS C ON R.CUSTOMER_ID  = C.CUSTOMER_ID;
+
+/*43. Muestra todos los clientes y sus alquileres si existen, incluyendo
+aquellos que no tienen alquileres.*/
+SELECT CONCAT(C.FIRST_NAME, ' ', C.LAST_NAME) AS customer,
+		R.RENTAL_ID,  
+FROM CUSTOMER AS C 
+LEFT JOIN RENTAL AS R ON C.CUSTOMER_ID = R.CUSTOMER_ID
+ORDER BY customer;
+
+
+/*44. Realiza un CROSS JOIN entre las tablas film y category. ¿Aporta valor
+esta consulta? ¿Por qué? Deja después de la consulta la contestación.*/
+SELECT *
+FROM FILM AS F 
+CROSS JOIN CATEGORY AS C;
+/*No aporta valor, ya que se repiten muchas filas que no dan ninguna información extra qualitativa. El cross join puede ser utila para
+hacer combinación sobre tablas que tengan un componente mas númerico y no tan categórico, como en esta BBDD.*/
+
