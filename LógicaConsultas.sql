@@ -188,9 +188,9 @@ GROUP BY DATE_TRUNC('MONTH', R.RENTAL_DATE)
 ORDER BY num_alquileres;
 
 --26. Encuentra el promedio, la desviación estándar y varianza del total pagado.
-SELECT ROUND(AVG(AMOUNT), 2) as payment_average, 
-		ROUND(STDDEV(AMOUNT), 2) as payment_standard_desviation, 
-		ROUND(VARIANCE(AMOUNT), 2) as variance
+SELECT ROUND(AVG(AMOUNT), 2) as average, 
+		ROUND(STDDEV(AMOUNT), 2) as standard_desviation, 
+		ROUND(VARIANCE(AMOUNT), 2) as 
 FROM PAYMENT AS P;
 
 --27. ¿Qué películas se alquilan por encima del precio medio?
@@ -212,3 +212,70 @@ GROUP BY A.ACTOR_ID
 HAVING COUNT(FA.FILM_ID) > 40
 ORDER BY total_peliculas desc;
 
+--29. Obtener todas las películas y, si están disponibles en el inventario,mostrar la cantidad disponible.
+
+/*SELECT *
+FROM INVENTORY AS I 
+
+SELECT F.FILM_ID,
+	F.TITLE,
+	COUNT(I.INVENTORY_ID) AS inventory_available
+FROM FILM AS F 
+JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
+LEFT JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+WHERE R.RETURN_DATE  is not null
+GROUP BY F.FILM_ID
+ORDER BY F.FILM_ID;
+
+
+SELECT F.FILM_ID,
+	F.TITLE,
+	COUNT(I.INVENTORY_ID) AS inventory_available
+FROM FILM AS F 
+JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
+WHERE EXISTS (
+	SELECT 1
+    FROM INVENTORY AS I2  
+    JOIN RENTAL AS R ON I2.INVENTORY_ID = R.INVENTORY_ID
+    where R.RETURN_DATE is not NULL
+)
+GROUP BY F.FILM_ID
+ORDER BY F.FILM_ID;*/
+
+--30. Obtener los actores y el número de películas en las que ha actuado.
+SELECT 	CONCAT(A.FIRST_NAME,' ',A.LAST_NAME) AS actor_name,
+		COUNT(FA.FILM_ID) AS film_number
+FROM ACTOR AS A 
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+GROUP BY A.ACTOR_ID
+ORDER by film_number desc;
+
+/*31. Obtener todas las películas y mostrar los actores que han actuado en
+ellas, incluso si algunas películas no tienen actores asociados.*/
+SELECT F.TITLE,
+		CONCAT(A.FIRST_NAME,' ',A.LAST_NAME) AS actor_name
+FROM FILM AS F 
+LEFT JOIN FILM_ACTOR AS FA ON F.FILM_ID = FA.FILM_ID
+LEFT JOIN ACTOR AS A ON FA.ACTOR_ID = A.ACTOR_ID
+order by F.TITLE, actor_name;
+--Marco un left join, para que se muestren películas incluso si no tienen actores asociados, como se pide.
+
+/*32. Obtener todos los actores y mostrar las películas en las que han
+actuado, incluso si algunos actores no han actuado en ninguna película.*/
+SELECT A.ACTOR_ID,
+		CONCAT(A.FIRST_NAME,' ',A.LAST_NAME) AS actor_name,
+		F.TITLE
+FROM ACTOR AS A 
+LEFT JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+LEFT JOIN FILM AS F ON FA.FILM_ID = F.FILM_ID 
+ORDER BY A.ACTOR_ID, F.TITLE;
+
+--33. Obtener todas las películas que tenemos y todos los registros de alquiler.
+SELECT F.TITLE,
+		COUNT(R.RENTAL_DATE) AS rental_register
+FROM FILM AS F 
+LEFT JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
+LEFT JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+GROUP BY F.TITLE
+ORDER BY rental_register;
+--volvemos a left join para no perder las películas que nunca se han alquilado.
