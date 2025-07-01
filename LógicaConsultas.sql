@@ -355,3 +355,55 @@ CROSS JOIN CATEGORY AS C;
 /*No aporta valor, ya que se repiten muchas filas que no dan ninguna información extra qualitativa. El cross join puede ser utila para
 hacer combinación sobre tablas que tengan un componente mas númerico y no tan categórico, como en esta BBDD.*/
 
+--45. Encuentra los actores que han participado en películas de la categoría 'Action'.
+SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME) as actor_name
+FROM ACTOR AS A  
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+JOIN FILM AS F ON FA.FILM_ID = F.FILM_ID
+JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+WHERE C."name" = 'Action';
+
+--46. Encuentra todos los actores que no han participado en películas.
+SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME) as actor_without_fims
+FROM ACTOR AS A 
+LEFT JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+WHERE FA.FILM_ID is null;
+--No existen actores sin películas en esta BBDD
+
+/*47. Selecciona el nombre de los actores y la cantidad de películas en las
+que han participado.*/
+SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME) AS actor,
+		COUNT(FA.FILM_ID) AS film_number
+FROM ACTOR AS A 
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+GROUP BY actor
+ORDER BY film_number DESC ;
+
+/*48. Crea una vista llamada “actor_num_peliculas” que muestre los nombres
+de los actores y el número de películas en las que han participado.*/
+CREATE VIEW actor_num_peliculas AS
+SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME) AS actor,
+		COUNT(FA.FILM_ID) AS film_number
+FROM ACTOR AS A 
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+GROUP BY actor;
+
+--Llamamos a la función con la query:
+SELECT *
+FROM actor_num_peliculas;
+
+--49. Calcula el número total de alquileres realizados por cada cliente.
+SELECT CONCAT(C.FIRST_NAME, ' ', C.LAST_NAME) AS customer,
+		COUNT(R.RENTAL_ID) AS rental_number
+FROM CUSTOMER AS C 
+JOIN RENTAL AS R ON C.CUSTOMER_ID = R.CUSTOMER_ID
+GROUP BY customer
+ORDER BY rental_number DESC ;
+
+--50. Calcula la duración total de las películas en la categoría 'Action'.
+SELECT SUM(F.LENGTH) total_action_length
+FROM FILM AS F 
+JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+WHERE C."name" = 'Action';
