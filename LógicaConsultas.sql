@@ -382,14 +382,16 @@ ORDER BY film_number DESC ;
 
 /*48. Crea una vista llamada “actor_num_peliculas” que muestre los nombres
 de los actores y el número de películas en las que han participado.*/
+/*Al tener hecha la consulta, que debemos introducir en la vista en la 
+consulta consulta 47, creamos la vista y pegamos esa consulta:*/
 CREATE VIEW actor_num_peliculas AS
 SELECT CONCAT(A.FIRST_NAME, ' ', A.LAST_NAME) AS actor,
 		COUNT(FA.FILM_ID) AS film_number
 FROM ACTOR AS A 
 JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
 GROUP BY actor;
-
---Llamamos a la función con la query:
+/*Llamamos a la función con la query y en Proyectos en DBeaver tendremos 
+ * siempre esta disponible esta vista:*/
 SELECT *
 FROM actor_num_peliculas;
 
@@ -407,3 +409,32 @@ FROM FILM AS F
 JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
 JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
 WHERE C."name" = 'Action';
+
+/*51. Crea una tabla temporal llamada “cliente_rentas_temporal” para
+almacenar el total de alquileres por cliente.*/
+/*Al tener hecha la consulta que debemos introducir en la tabla temporal en la 
+consulta consulta 49, creamos la tabla y pegamos esa consulta*/
+CREATE TEMPORARY TABLE cliente_rentas_temporal AS 
+SELECT CONCAT(C.FIRST_NAME, ' ', C.LAST_NAME) AS customer,
+		COUNT(R.RENTAL_ID) AS rental_number
+FROM CUSTOMER AS C 
+JOIN RENTAL AS R ON C.CUSTOMER_ID = R.CUSTOMER_ID
+GROUP BY customer
+ORDER BY rental_number DESC ;
+/*Consultamos la tabla temporal mediante la query y la tenemos disponible durante
+la sesión, para poder hacer otras consultas a partir de esta tabla:*/
+SELECT * FROM cliente_rentas_temporal;
+
+/*52. Crea una tabla temporal llamada “peliculas_alquiladas” que almacene las
+películas que han sido alquiladas al menos 10 veces.*/
+CREATE TEMPORARY TABLE peliculas_alquiladas AS
+SELECT F.TITLE,	
+		COUNT(R.RENTAL_ID) as rental_number
+FROM FILM AS F
+JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
+JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+GROUP BY F.TITLE
+HAVING COUNT(R.RENTAL_ID) >= 10
+ORDER BY F.TITLE;
+
+SELECT * FROM peliculas_alquiladas;
