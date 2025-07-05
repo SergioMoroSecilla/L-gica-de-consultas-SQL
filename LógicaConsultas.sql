@@ -162,7 +162,7 @@ FROM ACTOR AS A;
 
 --23. Números de alquiler por día, ordenados por cantidad de alquiler de forma descendente.
 SELECT
-  DATE_TRUNC('day', R.RENTAL_DATE) AS dia_alquile,
+  DATE_TRUNC('day', R.RENTAL_DATE) AS dia_alquiler,
   COUNT(*)                         AS num_alquileres
 FROM RENTAL AS R
 GROUP BY DATE_TRUNC('day', R.RENTAL_DATE)
@@ -438,3 +438,53 @@ HAVING COUNT(R.RENTAL_ID) >= 10
 ORDER BY F.TITLE;
 
 SELECT * FROM peliculas_alquiladas;
+
+/*53. Encuentra el título de las películas que han sido alquiladas por el cliente
+con el nombre ‘Tammy Sanders’ y que aún no se han devuelto. Ordena
+los resultados alfabéticamente por título de película.*/
+SELECT F.TITLE AS not_returned_film
+FROM FILM AS F 
+JOIN INVENTORY AS I ON f.FILM_ID = I.FILM_ID
+JOIN RENTAL AS R ON i.INVENTORY_ID = r.INVENTORY_ID
+JOIN CUSTOMER AS C ON r.CUSTOMER_ID = c.CUSTOMER_ID
+WHERE C.FIRST_NAME = 'TAMMY'
+  AND C.LAST_NAME = 'SANDERS'
+  AND R.RETURN_DATE IS NULL
+ORDER BY not_returned_film;
+
+--obtenemos que 'Tammy Sanders' no ha devuelto 3 peliculas: LUST LOCK, SLEEPY JAPANESE y TROUBLE DATE
+
+/*54. Encuentra los nombres de los actores que han actuado en al menos una
+película que pertenece a la categoría ‘Sci-Fi’. Ordena los resultados
+alfabéticamente por apellido.*/
+SELECT DISTINCT A.FIRST_NAME, A.LAST_NAME
+FROM ACTOR AS A 
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+JOIN FILM AS F ON FA.FILM_ID = F.FILM_ID
+JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+WHERE C."name" = 'Sci-Fi'
+ORDER BY A.LAST_NAME;
+--marcamos DISTINCT par que no me duplique actores que han actuado en mas de una pélicula de Sci-Fi.
+
+/*55. Encuentra el nombre y apellido de los actores que han actuado en
+películas que se alquilaron después de que la película ‘Spartacus
+Cheaper’ se alquilara por primera vez. Ordena los resultados
+alfabéticamente por apellido.*/
+
+--Podemos hacer una estructura CTE
+WITH primera_alquiler_Spartacus_Cheaper AS (
+  SELECT MIN(R.RENTAL_DATE) AS first_date
+  FROM FILM AS F 
+  JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
+  JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+  WHERE F.TITLE = 'Spartacus Cheaper'
+)
+SELECT DISTINCT A.FIRST_NAME, A.LAST_NAME
+FROM ACTOR AS A
+JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
+JOIN FILM AS F ON FA.FILM_ID = F.FILM_ID
+JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
+JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+ORDER BY A.LAST_NAME;
+
