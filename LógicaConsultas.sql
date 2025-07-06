@@ -494,18 +494,109 @@ ninguna película de la categoría ‘Music’.*/
 
 --Lo hago a través de subconsulta en where
 SELECT A.FIRST_NAME, A.LAST_NAME
-FROM ACTOR A
+FROM ACTOR AS  A
 WHERE A.ACTOR_ID NOT IN (
   SELECT DISTINCT A2.ACTOR_ID
-  FROM ACTOR A2
-  JOIN FILM_ACTOR FA ON A2.ACTOR_ID = FA.ACTOR_ID
-  JOIN FILM F ON FA.FILM_ID = F.FILM_ID
-  JOIN FILM_CATEGORY FC ON F.FILM_ID = FC.FILM_ID
-  JOIN CATEGORY C ON FC.CATEGORY_ID = C.CATEGORY_ID
-  WHERE C.NAME = 'MUSIC'
+  FROM ACTOR AS A2
+  JOIN FILM_ACTOR AS FA ON A2.ACTOR_ID = FA.ACTOR_ID
+  JOIN FILM AS F ON FA.FILM_ID = F.FILM_ID
+  JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+  JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+  WHERE C."name" = 'MUSIC'
 )
 ORDER BY A.LAST_NAME, A.FIRST_NAME;
 
+--57. Encuentra el título de todas las películas que fueron alquiladas por más de 8 días.
+SELECT DISTINCT F.TITLE 
+FROM FILM AS F 
+JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID 
+JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+WHERE  R.RETURN_DATE IS NOT NULL
+AND R.RETURN_DATE - R.RENTAL_DATE > INTERVAL '8 DAYS'
+ORDER BY F.TITLE;
+/*He buscado la solución "INTERVAL", que es un operador que me permite restar dos valores de variables
+TIMESTAMP dando como resulta un intervalo que acoto a '8 days', pudiendo buscar intervalos de meses, 
+años, días, horas, minutos y segundos, si fuera necesario*/ 
 
+--58. Encuentra el título de todas las películas que son de la misma categoría que ‘Animation’.
+SELECT F.TITLE 
+FROM FILM AS F
+JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+WHERE C.CATEGORY_ID = (
+  SELECT CATEGORY_ID
+  FROM CATEGORY AS C2
+  WHERE C2."name" = 'Animation'
+)
+ORDER BY F.TITLE;
+--Realizo una subquery desde Where para acotar la busqueda en la categoría 'Animation'
+
+
+/*59. Encuentra los nombres de las películas que tienen la misma duración
+que la película con el título ‘Dancing Fever’. Ordena los resultados
+alfabéticamente por título de película.*/
+SELECT F.TITLE
+FROM FILM AS F 
+WHERE F.LENGTH = (
+	SELECT F.LENGTH 
+	FROM FILM AS F 
+	WHERE F.TITLE  = 'DANCING FEVER'
+)
+ORDER BY F.TITLE;
+
+/*60. Encuentra los nombres de los clientes que han alquilado al menos 7
+películas distintas. Ordena los resultados alfabéticamente por apellido.*/
+SELECT
+  C.FIRST_NAME,
+  C.LAST_NAME,
+  COUNT(DISTINCT I.FILM_ID) AS distinct_films
+FROM CUSTOMER AS C
+JOIN RENTAL AS R ON C.CUSTOMER_ID = R.CUSTOMER_ID
+JOIN INVENTORY AS I ON R.INVENTORY_ID = I.INVENTORY_ID
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+HAVING COUNT(DISTINCT I.FILM_ID) >= 7
+ORDER BY C.LAST_NAME;
+
+/*61. Encuentra la cantidad total de películas alquiladas por categoría y
+muestra el nombre de la categoría junto con el recuento de alquileres.*/
+SELECT C.NAME AS category, COUNT(R.RENTAL_ID) AS total_rentals
+FROM RENTAL AS R
+JOIN INVENTORY AS I ON R.INVENTORY_ID = I.INVENTORY_ID
+JOIN FILM AS F ON I.FILM_ID = F.FILM_ID
+JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+GROUP BY C."name" 
+ORDER BY total_rentals DESC;
+
+/*62. Encuentra el número de películas por categoría estrenadas en 2006.*/
+SELECT C."name" AS category, COUNT(F.FILM_ID) AS total_films
+FROM FILM AS F
+JOIN FILM_CATEGORY AS FC ON F.FILM_ID = FC.FILM_ID
+JOIN CATEGORY AS C ON FC.CATEGORY_ID = C.CATEGORY_ID
+WHERE F.RELEASE_YEAR = 2006
+GROUP BY C."name" 
+ORDER BY total_films DESC;
+
+/*63. Obtén todas las combinaciones posibles de trabajadores con las tiendas
+que tenemos.*/
+SELECT S.FIRST_NAME AS EMPLEADO_NOMBRE,
+       S.LAST_NAME AS EMPLEADO_APELLIDO,
+       ST.STORE_ID AS TIENDA_ID
+FROM STAFF AS S
+CROSS JOIN STORE AS ST
+ORDER BY S.LAST_NAME, S.FIRST_NAME, ST.STORE_ID;
+--Vemos que los dos únicos miembros del Staff, se encuentran en las dos tiendas
+
+/*64. Encuentra la cantidad total de películas alquiladas por cada cliente y
+muestra el ID del cliente, su nombre y apellido junto con la cantidad de
+películas alquiladas.*/
+SELECT C.CUSTOMER_ID,
+		C.FIRST_NAME,
+		C.LAST_NAME, 
+    		COUNT(R.RENTAL_ID) AS total_rentals
+FROM CUSTOMER AS C
+JOIN RENTAL AS R ON C.CUSTOMER_ID = R.CUSTOMER_ID 
+GROUP BY C.CUSTOMER_ID, C.FIRST_NAME, C.LAST_NAME
+ORDER BY total_rentals DESC; 
 
 
