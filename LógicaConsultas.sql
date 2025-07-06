@@ -473,12 +473,12 @@ Cheaper’ se alquilara por primera vez. Ordena los resultados
 alfabéticamente por apellido.*/
 
 --Podemos hacer una estructura CTE
-WITH primera_alquiler_Spartacus_Cheaper AS (
+WITH primer_alquiler_Spartacus_Cheaper AS (
   SELECT MIN(R.RENTAL_DATE) AS first_date
-  FROM FILM AS F 
-  JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
-  JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
-  WHERE F.TITLE = 'Spartacus Cheaper'
+  FROM RENTAL AS R 
+  JOIN INVENTORY AS I ON R.INVENTORY_ID = I.INVENTORY_ID
+  JOIN FILM AS F  ON I.FILM_ID = F.FILM_ID
+  WHERE F.TITLE = 'SPARTACUS CHEAPER'
 )
 SELECT DISTINCT A.FIRST_NAME, A.LAST_NAME
 FROM ACTOR AS A
@@ -486,5 +486,26 @@ JOIN FILM_ACTOR AS FA ON A.ACTOR_ID = FA.ACTOR_ID
 JOIN FILM AS F ON FA.FILM_ID = F.FILM_ID
 JOIN INVENTORY AS I ON F.FILM_ID = I.FILM_ID
 JOIN RENTAL AS R ON I.INVENTORY_ID = R.INVENTORY_ID
+JOIN primer_alquiler_Spartacus_Cheaper AS paSC ON R.RENTAL_DATE > paSC.first_date
 ORDER BY A.LAST_NAME;
+
+/*56. Encuentra el nombre y apellido de los actores que no han actuado en
+ninguna película de la categoría ‘Music’.*/
+
+--Lo hago a través de subconsulta en where
+SELECT A.FIRST_NAME, A.LAST_NAME
+FROM ACTOR A
+WHERE A.ACTOR_ID NOT IN (
+  SELECT DISTINCT A2.ACTOR_ID
+  FROM ACTOR A2
+  JOIN FILM_ACTOR FA ON A2.ACTOR_ID = FA.ACTOR_ID
+  JOIN FILM F ON FA.FILM_ID = F.FILM_ID
+  JOIN FILM_CATEGORY FC ON F.FILM_ID = FC.FILM_ID
+  JOIN CATEGORY C ON FC.CATEGORY_ID = C.CATEGORY_ID
+  WHERE C.NAME = 'MUSIC'
+)
+ORDER BY A.LAST_NAME, A.FIRST_NAME;
+
+
+
 
