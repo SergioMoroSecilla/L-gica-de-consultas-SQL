@@ -10,11 +10,6 @@ Este proyecto forma parte del máster en Data & Analytics de ThePower. El objeti
 - DBeaver
 - GitHub
 
-## 📁 Estructura del proyecto
-- EnunciadoDatProject_SQL.Lógica(1).pfs # Documento con todas las queries a solucionar
-- Esquema.png # Imagen de todas las tablas de la BBDD y sus relaciones
-- LógicaConsultas.sql # Archivo con las consultas resueltas (comentadas por número)
-
 ## ✅ Requisitos cumplidos
 -  Manejo de DBeaver
 -  Archivo del esquema de la BBDD
